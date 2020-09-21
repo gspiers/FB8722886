@@ -16,6 +16,15 @@ An array of the supplementary items that are associated with the boundary edges 
 
 ## Example
 
+* Yellow - Cells
+* Red - Section header
+* Orange - Global header
+* Green - Global footer
+
+Left simulator is using compositional layout. Header/footer remains visible at all times.
+
+Right simulator is using compositional layout with sections that are configured with orthogonal scrolling. Notice the header and the global orange header and the global green footer disappears while scrolling.
+
 [Full resolution video of bug](compositional_bug.mov).
 
 ![](compositional_bug.gif)
