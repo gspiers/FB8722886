@@ -2,6 +2,18 @@
 
 Sample project for Apple Feedback number FB8722886, UICollectionViewCompositionalLayout: Pinned boundary supplementary items disappear when layout contains sections with orthogonal scrolling.
 
+## Update (2021-06-08)
+
+iOS 15 beta 1 seems to fix the dissappearing items however the `zIndex` of the layout items appear incorrect. The layout items (orange view) appear below the section items (red view).
+
+![](compositional_bug_ios15.mov)
+[iOS 15 beta 1 behaviour video](compositional_bug_ios15.mov).
+
+When turning off othogonol scrolling the correct behaviour is observed.
+
+![](compositional_bug_no_orthogonal.mp4)
+[iOS 15 beta 1 without orthogonal video](compositional_bug_no_orthogonal.mp4).
+
 ## Details
 
 When using UICollectionView compositional layout I’m trying to pin global headers using `pinToVisibleBounds = true` for boundary items. This does not work as expected when the layout has a section that has `section.orthogonalScrollingBehavior = .continuous`. The global boundary items disappear as you scroll down (see sample project and video).
