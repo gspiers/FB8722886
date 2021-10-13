@@ -41,4 +41,48 @@ Right simulator is using compositional layout with sections that are configured 
 
 ![](compositional_bug.gif)
 
+## Work around for iOS 14
+
+```swift
+// In the cell:
+
+/// Feedback: FB8722886
+    /// https://github.com/gspiers/FB8722886
+    /// Compositional Layout has a bug where global boundary supplementary views that have `pinToVisibleBounds=true` disappear if any of the section use orthogonal behavior.
+    /// The layout itself does calculate layout attributes, but the UICollectionView stops applying them in `layoutSubviews` once the `maxY` of the supplementary view would have scrolled off the screen.
+    /// See `FixStickyHeaderCollectionView` for other side of this workaround.
+    /// We apply these two attributes here to keep this header sticky as the super call above does not apply them after scrolling down a little bit.
+    override public func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
+        super.apply(layoutAttributes)
+
+        // Always apply frame and isHidden ourselves (see comment above).
+        frame = layoutAttributes.frame
+        layer.isHidden = layoutAttributes.isHidden
+    }
+
+
+// Use this UICollectionView subclass
+
+/// Feedback: FB8722886
+/// https://github.com/gspiers/FB8722886
+/// Compositional Layout has a bug where global boundary supplementary views that have `pinToVisibleBounds=true` disappear if any of the section use orthogonal behavior.
+/// The layout itself does calculate layout attributes, but the UICollectionView stops applying them in `layoutSubviews` once the `maxY` of the supplementary view would have scrolled off the screen.
+/// We get the layout attributes for the header and apply them ourselves to the header view.
+@available(iOS 13.0, *)
+private class FixStickyHeaderCollectionView: UICollectionView {
+    override func layoutSubviews() {
+        super.layoutSubviews()
+
+        let attributes = collectionViewLayout.layoutAttributesForSupplementaryView(ofKind: ViewAllCategoriesHeaderReusableView.supplementaryViewKind, at: IndexPath(indexes: [0]))
+
+        let firstLayoutHeader = subviews.first { $0 is ViewAllCategoriesHeaderReusableView }
+
+        // Even if UIKit fixes this we should only be applying the attributes twice in the worse case.
+        if let reuseableView = firstLayoutHeader as? UICollectionReusableView, let attributes = attributes {
+            reuseableView.apply(attributes)
+        }
+    }
+}
+```
+
 
